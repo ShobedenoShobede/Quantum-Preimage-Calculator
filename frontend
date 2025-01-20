@@ -1,3 +1,88 @@
 cd ../frontend
 mkdir src public
 touch src/App.jsx Dockerfile package.json public/index.html
+import React, { useState } from 'react';
+
+const App = () => {
+    const [hashes, setHashes] = useState(['']);
+    const [preimageResults, setPreimageResults] = useState([]);
+    const [recipientAddress, setRecipientAddress] = useState('');
+    const [privateKeyWIF, setPrivateKeyWIF] = useState('');
+    const [txid, setTxid] = useState('');
+    const [newWallet, setNewWallet] = useState(null);
+
+    const handleHashChange = (index) => (event) => {
+        const newHashes = [...hashes];
+        newHashes[index] = event.target.value;
+        setHashes(newHashes);
+    };
+
+    const addHashField = () => setHashes([...hashes, '']);
+
+    const calculatePreimages = async () => {
+        const response = await fetch('/calculate-preimages', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ hashes }),
+        });
+        const data = await response.json();
+        setPreimageResults(data);
+    };
+
+    const sendPreimage = async (preimage) => {
+        const response = await fetch('/send-preimage', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ recipientAddress, preimage, privateKeyWIF }),
+        });
+        const data = await response.json();
+        setTxid(data.txid);
+    };
+
+    const generateWallet = async () => {
+        const response = await fetch('/generate-wallet', {
+            method: 'POST',
+        });
+        const wallet = await response.json();
+        setNewWallet(wallet);
+    };
+
+    return (
+        <div>
+            <h1>Quantum Preimage Calculator</h1>
+            <div>
+                <h2>Calculate Preimages</h2>
+                {hashes.map((hash, i) => (
+                    <input
+                        key={i}
+                        value={hash}
+                        onChange={handleHashChange(i)}
+                        placeholder="Enter hash"
+                    />
+                ))}
+                <button onClick={addHashField}>Add Hash</button>
+                <button onClick={calculatePreimages}>Calculate</button>
+                <ul>
+                    {preimageResults.map((result, i) => (
+                        <li key={i}>
+                            {result.hash}: {result.preimage}
+                            <button onClick={() => sendPreimage(result.preimage)}>Send to Wallet</button>
+                        </li>
+                    ))}
+                </ul>
+            </div>
+            <div>
+                <h2>Generate Wallet</h2>
+                <button onClick={generateWallet}>Generate Wallet</button>
+                {newWallet && (
+                    <div>
+                        <p>Address: {newWallet.address}</p>
+                        <p>Private Key: {newWallet.privateKey}</p>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
+export default App;
