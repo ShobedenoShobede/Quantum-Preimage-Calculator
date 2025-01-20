@@ -1,0 +1,2 @@
+cd quantum-preimage-calculator/backend
+touch server.js Dockerfile package.json
