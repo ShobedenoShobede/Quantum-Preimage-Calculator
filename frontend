@@ -1,0 +1,3 @@
+cd ../frontend
+mkdir src public
+touch src/App.jsx Dockerfile package.json public/index.html
