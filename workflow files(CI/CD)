@@ -1,4 +1,0 @@
-cd ../../.github/workflows
-touch ci-cd.yml
-mkdir -p quantum-preimage-calculator/.github/workflows
-cd quantum-preimage-calculator/.github/workflows
