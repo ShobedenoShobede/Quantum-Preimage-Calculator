@@ -65,3 +65,4 @@ app.post('/generate-wallet', (req, res) => {
 app.listen(3000, () => console.log('Server running on port 3000'));
 cd quantum-preimage-calculator/backend
 npm install
+node server.js
